@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
  * Copyright (C) 2011-2016  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__ASSERT_H
-#define FLAC__ASSERT_H
+#ifndef FLAC__PRIVATE__FORMAT_H
+#define FLAC__PRIVATE__FORMAT_H
 
-/* we need this since some compilers (like MSVC) leave assert()s on release code (and we don't want to use their ASSERT) */
-#ifdef DEBUG
-#include <assert.h>
-#define FLAC__ASSERT(x) assert(x)
-#define FLAC__ASSERT_DECLARATION(x) x
-#else
-#define FLAC__ASSERT(x)
-#define FLAC__ASSERT_DECLARATION(x)
-#endif
+#include "FLAC/format.h"
+
+unsigned FLAC__format_get_max_rice_partition_order(unsigned blocksize, unsigned predictor_order);
+unsigned FLAC__format_get_max_rice_partition_order_from_blocksize(unsigned blocksize);
+unsigned FLAC__format_get_max_rice_partition_order_from_blocksize_limited_max_and_predictor_order(unsigned limit, unsigned blocksize, unsigned predictor_order);
+void FLAC__format_entropy_coding_method_partitioned_rice_contents_init(FLAC__EntropyCodingMethod_PartitionedRiceContents *object);
+void FLAC__format_entropy_coding_method_partitioned_rice_contents_clear(FLAC__EntropyCodingMethod_PartitionedRiceContents *object);
+FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_size(FLAC__EntropyCodingMethod_PartitionedRiceContents *object, unsigned max_partition_order);
 
 #endif

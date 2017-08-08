@@ -30,17 +30,44 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__ASSERT_H
-#define FLAC__ASSERT_H
-
-/* we need this since some compilers (like MSVC) leave assert()s on release code (and we don't want to use their ASSERT) */
-#ifdef DEBUG
-#include <assert.h>
-#define FLAC__ASSERT(x) assert(x)
-#define FLAC__ASSERT_DECLARATION(x) x
-#else
-#define FLAC__ASSERT(x)
-#define FLAC__ASSERT_DECLARATION(x)
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
 #endif
 
-#endif
+#include "private/bitmath.h"
+
+/* An example of what FLAC__bitmath_silog2() computes:
+ *
+ * silog2(-10) = 5
+ * silog2(- 9) = 5
+ * silog2(- 8) = 4
+ * silog2(- 7) = 4
+ * silog2(- 6) = 4
+ * silog2(- 5) = 4
+ * silog2(- 4) = 3
+ * silog2(- 3) = 3
+ * silog2(- 2) = 2
+ * silog2(- 1) = 2
+ * silog2(  0) = 0
+ * silog2(  1) = 2
+ * silog2(  2) = 3
+ * silog2(  3) = 3
+ * silog2(  4) = 4
+ * silog2(  5) = 4
+ * silog2(  6) = 4
+ * silog2(  7) = 4
+ * silog2(  8) = 5
+ * silog2(  9) = 5
+ * silog2( 10) = 5
+ */
+unsigned FLAC__bitmath_silog2(FLAC__int64 v)
+{
+	if(v == 0)
+		return 0;
+
+	if(v == -1)
+		return 2;
+
+	v = (v < 0) ? (-(v+1)) : v;
+	return FLAC__bitmath_ilog2_wide(v)+2;
+}

@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001-2009  Josh Coalson
+ * Copyright (C) 2000-2009  Josh Coalson
  * Copyright (C) 2011-2016  Xiph.Org Foundation
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,17 +30,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__ASSERT_H
-#define FLAC__ASSERT_H
+#ifndef FLAC__PRIVATE__CRC_H
+#define FLAC__PRIVATE__CRC_H
 
-/* we need this since some compilers (like MSVC) leave assert()s on release code (and we don't want to use their ASSERT) */
-#ifdef DEBUG
-#include <assert.h>
-#define FLAC__ASSERT(x) assert(x)
-#define FLAC__ASSERT_DECLARATION(x) x
-#else
-#define FLAC__ASSERT(x)
-#define FLAC__ASSERT_DECLARATION(x)
+#include "FLAC/ordinals.h"
+
+/* 8 bit CRC generator, MSB shifted first
+** polynomial = x^8 + x^2 + x^1 + x^0
+** init = 0
+*/
+extern FLAC__byte const FLAC__crc8_table[256];
+#define FLAC__CRC8_UPDATE(data, crc) (crc) = FLAC__crc8_table[(crc) ^ (data)];
+void FLAC__crc8_update(const FLAC__byte data, FLAC__uint8 *crc);
+void FLAC__crc8_update_block(const FLAC__byte *data, unsigned len, FLAC__uint8 *crc);
+FLAC__uint8 FLAC__crc8(const FLAC__byte *data, unsigned len);
+
+/* 16 bit CRC generator, MSB shifted first
+** polynomial = x^16 + x^15 + x^2 + x^0
+** init = 0
+*/
+extern unsigned const FLAC__crc16_table[256];
+
+#define FLAC__CRC16_UPDATE(data, crc) ((((crc)<<8) & 0xffff) ^ FLAC__crc16_table[((crc)>>8) ^ (data)])
+/* this alternate may be faster on some systems/compilers */
+#if 0
+#define FLAC__CRC16_UPDATE(data, crc) ((((crc)<<8) ^ FLAC__crc16_table[((crc)>>8) ^ (data)]) & 0xffff)
 #endif
+
+unsigned FLAC__crc16(const FLAC__byte *data, unsigned len);
 
 #endif
